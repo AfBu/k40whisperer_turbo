@@ -1,0 +1,319 @@
+Version 0.01:
+- Initial Release
+
+Version 0.02:
+- Added Min/Max darkness cutoff settings for halftone raster images.
+- Fixed bug that could cause raster engraving to start engraving the wrong direction.
+- Fixed error messages and added better error messages.
+- Removed dependency on Numpy.
+
+Version 0.03:
+- Added more descriptive test to "No Backend Error" to indicate libUSB is not installed
+- Removed debugging code that could have resulted in the head moving 1" away from raster image.
+- Updated Raster test pattern SVG
+
+Version 0.04:
+- Improvements to DXF import to prevent import failures
+- DXF import now detects blue lines and designates them as engraving lines.
+- DXF import looks for layers that have the text "engrave" in the name and designates items on the layer as engraving lines.
+- DXF import now detects the units in the file.  If no units are specified the user is prompted to select the correct units. 
+- Stop button now works during all phases of engraving preparation
+- Status updates more during engraving preparation and engraving process
+- Stop button now pauses job with the option to resume or terminate the job.
+- Added error on detection of color coded text in SVG files.
+- Deleted Min/Max darkness cutoff settings for halftone raster images.
+- Added Levels settings utilizing a Bezier curve to control the levels of gray-scale images
+- Changed scan-line step input to always be in inches. (Raster settings are in inches/dpi now)
+
+Version 0.05:
+- Added option to support homing in the upper right corner (instead of the upper left corner) for some 50W machines
+- Changed the final move after vector engrave and vector cutting to be a rapid move to the starting position (was at working speed move).
+- Updated code to support more easily running on Mac computers.  Instructions added in the src zip file for getting started on Mac.
+- Added code to eliminate the requirement for the PIL/Pillow _imaging C module.
+- Started updating for compatibility with Python 3 (this is a low priority work in progress)
+
+Version 0.06:
+- Added code to DXF class to fix bad knot data in splines.
+- Added better status messages during image processing
+- Changed half toning to PIL/PILLOW half toning (faster)
+- Added better error message for Memory Error which previously resulted in a blank message box.
+- Added a 64bit executable to the list of downloads to address memory issued with 32bi application
+
+Version 0.07:
+- Fixed "maximum recursion depth exceeded in cmp" error when engraving/cutting.
+- Adjusted code for better memory management when generating data for the laser cutter.
+
+Version 0.08:
+- Fixed X-axis rapid motion bug that resulted in a engraving/cutting offset after some .003 inch rapid motions.
+- Instructions added in the src zip file for getting setup on Linux (README_Linux.txt).
+- Added setting for B1 boards Not enabled yet still need to be tested
+
+Version 0.09:
+- Adjusted DXF import to avoid DXF loading fail due to rounding error during calculations.
+
+Version 0.10:
+- Added support for SVG "polyline" and "polygon" objects 
+- Added code to automatically convert text to paths when red/blue vector text outlines are found.
+- Hidden layers now remain hidden.
+
+Version 0.11:
+- Added support for reading g-code.
+- Enabled option for controller board version B1
+- Fixed a bug that resulted in bad design scaling if one of the feed rates were not entered correctly when changing units.
+- Added support for SVG "Line" objects
+
+Version 0.12:
+- Added advanced options pane
+- Added multi-pass engraving and cutting
+- Added Mirror option
+- Added "Use Input CSYS" option to force K40 Whisperer to use the coordinate system from the input design (the default is to use the upper left corner of the design).
+- Added option to disable homing the laser cutter upon initialization.
+- Added option to disable preprocessing of CRC data.  Un-selecting the "Preprocess CRC Data" option results in the CRC data being generated on the fly while data is being sent to the laser.
+- Added option in Rester Settings to force engraving from the bottom of the raster image to the top.  Sometimes this is useful to prevent smoke from spoiling the engraved image.
+- Changed the communication with the laser cutter to include error detection/correction during transmission of data.
+- Fixed bug that resulted in the laser area value being removed during a change in units
+
+Version 0.13:
+- Fixed g-code processing so that it does not ignore spindle inputs. Now works with raster input from LaserWeb4
+- Fixed bug that could result in "'update_gui' is not defined" error.
+
+Version 0.14:
+- Fixed bug that resulted in two passes on some vector cut and vector engrave paths
+- Changed some error messages to be less confusing.
+
+Version 0.15:
+- Fixed DXF import so it recognizes colors assigned at the layer level
+- Improved DXF warning messages.  Identical messages are now counted and to displayed in one line.
+- Added support for the remaining board type supported by LaserDRW
+
+Version 0.16:
+- Added support for CSS style data in SVG files (some version of CorelDraw use this formating for SVG files)
+- Fixed divide by zero error for some DXF files
+- Fixed "zip" error for broken SVG files (now ignores the error)
+- Added rough time estimates for engraving/cutting times
+- Can now move design around while keeping the laser head at any corner or at the center of the design. (It will move back to upper left when laser starts.)
+- Added display of the current design file name in the main window title bar.
+- Now accepts SVG 'style' data that is not in the style attribute.
+
+Version 0.17:
+- Added ability to set scale factor values for the X and Y axes to fine tune output.
+- Added rotate option in the advanced settings to rotate designs 90 degrees
+- Fixed SVG input for rectangles that had radii specified that were larger than possible given the rectangle size.
+- Fixed SVG import of files with mixed CSS data and style data
+- Fixed error that prevented G-Code from running in Version 0.16
+- Fixed bug that could cause program to enter infinite loop after lost connection with laser
+- Made a slightly better error message for when an operation is attempted and the laser has not been initialized.
+
+Version 0.18:
+- Fixed import of polygons and polylines items in SVG files without the customary commas
+- Fixed bug that caused moving to the corners to not work for SVG files if the "Use Input CSYS" was selected for DXF files.
+
+Version 0.19:
+- Fixed SVG import error for SVG files with extra spaces in point definitions
+
+Version 0.20:
+- Fixed bug that resulted in 45 degree angles (and other shapes not straight lines) being cut faster than horizontal and vertical lines.
+- Added keyboard shortcuts for some main window functions
+- Fixed divide by zero error when running g-code with very slow feed rates
+- Added support for hidden layers in DXF files
+- Improved interpretation of some DXF files
+- Added ability to save and run EGV files.  Can run EGV files made by LaserDRW and generate files that can be run from LaserDRW.
+- Changed behavior after number of timeouts is exceeded during a design run.  K40 Whisperer will continue to try running the job until the user stops it.  Previously and error window would pop up and the job would be terminated without user intervention.  During pre-run moves the error window will still pop up.
+- Added logic to wait for the laser to finish running a job before the interface becomes active again.
+
+Version 0.21:
+- Updated build scripts to eliminate errors on some Windows computers.
+- Changed default setting so that halftone/dithering is turned on.
+- Fixed bug that generated error sometimes when opening a design is canceled from the file select dialog.
+
+Version 0.22:
+- Fixed DXF import so that working with DXF files will be faster.
+- Added link to the new manual web page in the Help menu
+- Updated code to work with Python 3 (Still works with Python 2.7)
+- Number of timeouts setting not controls how many timeouts trigger a laser disconnected message at the end of engraving.
+- Added Python version information to the Help info window
+
+Version 0.23:
+- Fixed DXF import for a specific subset of DXF files that use multiple layers designations for a single feature (array commands?).
+
+Version 0.24:
+- Fixed handling of large laser area files.  Previous version would fail to generate raster data for large areas.
+- Fixed compatibility with Python 3.7
+- Added better error reporting when raster data fails to be produced by Inkscape
+
+Version 0.25:
+- Fixed a variety of minor issues with SVG import (especially files generated with Adobe Illustrator)
+- Fixed a couple of issues with importing DXF files.
+- Added option to invert colors for raster engraving.
+
+Version 0.26:
+- Fixed option to invert colors for raster engraving.
+- Fixed more compatibility problems with Python 3
+- Added zoom to design size option
+- Added options to combine engrave operations, vector operations or all operations.
+
+Version 0.27:
+- Fixed speeds for M2 controller boards.  Higher speeds were inaccurate.
+
+Version 0.28:
+- Added ability to move the laser head to any position on the design.  Use the right mouse button to move the laser head independent of the design location.  Previously could only move to corners and center.)
+- Reduced the number of times the display updates during calculation.
+- Fixed speeds for controller boards (except M2).  Higher speeds were inaccurate.
+
+Version 0.29:
+- Slowed down the movement to return to the zero position after engraving.  At high speeds the laser head would sometimes over-run and slam into the hard-stop if the job was started from the home position.
+- Added command to stop windows computers from going to sleep while the laser is running.
+- Changed the SVG reader so it ignores CSS entry without data instead of throwing an error.
+- Added key binding for alt-control-(arrow keys) for moving the laser head independent of the design.
+
+Version 0.30:
+- Added check box to enable/disable the settings typically used for a rotary fixture.  
+- Added option to set rapid speeds in the general settings.  (zero uses the default controller rapid speed.)
+- Fixed SVG reader so hidden layers are hidden. (In some cases they were being shown.)
+- Fixed problem that caused excessive memory use when dithering was disabled.
+
+Changes in Version 0.31
+- Improved speed codes (again) now uses library from the K40Nano project on Github 
+- Added workaround for non UTF-8 characters in SVG files (Files from Adobe Illustrator sometimes have these). 
+- Fixed SVG reader so cloned objects work now. 
+- Added dialog box to manually set scale for SVG files that do not have physical scale fully defined. You should be able to bring in files without setting the units and view box in Inkscape. (Users will need to verify scale is correct for there designs.) 
+- Improved cascading style sheet interpretation for style information. (Some colors could being missed before the improvement.) 
+- Fixed crash on startup if data in settings file is incorrect. 
+- Changed writing location for error log files to avoid attempting to write to folders that are write protected. 
+- Added clarification to the installer script to specify the laser needs to be on when installing the driver. 
+- Fixed a cannot convert string to float error for SVG files that define circles as ellipses.
+
+Changes in Version 0.32
+- Added fix for timeout issues.
+
+Version 0.33:
+- Fixed potential error when decimal points are added to integer input values.
+- Fixed erroneous closing of loops in some DXF files
+- Fixed potential cause of lost data during sending data to the laser
+- Fixed bug that caused laser to move in the wrong direction for certain cases while running g-code.
+- Made the "Stop" button respond faster and after clicking "OK" the laser will stop motion faster.
+
+Version 0.34:
+- Fixed "float() argument must be a string or number error" for some SVG files.
+- Now respects display='none' for vector engrave/cut items in SVG files.
+
+Version 0.35:
+- Fixed arrow button, center and corner button functions when using rotary settings. (These functions where broken in a previous version.)
+- Changed vector engrave function so that it does not try to cut inside first.  This greatly speeds up processing for complex designs.
+
+Version 0.36:
+- Fixed rapid motion problems during and at end of raster engraving with certain settings. (Especially when raster engraving bottom up.)
+
+Version 0.37:
+- Fixed another occurrence of "float() argument must be a string or number error" for some SVG files.
+
+Version 0.38:
+- Fixed call to Inkscape so it works with Inkscape Version 1.0 Beta
+- Replaced USB menu with Tools menu and added additional tools (trace and compute raster time) 
+- Added Trace boundary option to Tools menu (traces around convex hull of the design)
+- Added shortcut keys so that number pad can be used to control laser head position
+- Added post run options in General settings (home, beep, display report, execute batch file)
+- Improved time estimates for raster engraving (Now uses actual laser path data.)
+- Added option to control timeout time for Inkscape subprocess execution
+- Added command line option for smaller display (-p or --pi)
+
+Version 0.39:
+- Fixed problem that prevented the main screen from being disabled while the laser is running or calculations are being performed.
+
+Version 0.40:
+- Fixed problem reading some style data from SVG files. 
+
+Version 0.41:
+- Fixed more minor issues reading certain SVG files.
+
+Version 0.42:
+- Minor update to DXF reading to include color by layer
+- Fix for Inkscape Executable location button.  Auto generated text made bu the button did not work for some version of Python
+- Fixed trace boundary when X and Y scaling is used
+- Limited minimum speed entries to prevent unexpected laser movements.
+- Fixed trace boundary space so that it scales with units change.
+
+Version 0.43:
+- Fixed problem that prevented properly sending EGV file to the laser.
+
+Version 0.44:
+- Removed unnecessary commands from data sent to laser.  Reduced volume of data sent to laser.
+- Improved pause function.  Laser not stops immediately rather than waiting for buffer to empty.
+- Added code to get around "Backend not found" error in some cases.
+
+Version 0.45:
+- Reverted back to egv.py file from Version 0.43 fixing problem with movements introduced in Version 0.44
+
+Version 0.46:
+- Fixed error in positioning when using g-code input and the input coordinate system
+- Improved display of g-code errors and warnings
+- Changed file selection default to g-code if the last file opened was g-code
+
+Version 0.47:
+- Updated to work with Inkscape 1.0
+- Fixed mirroring when using input axes
+
+Version 0.48:
+- Fixed auto convert text to path when using older versions of Inkscape
+
+Version 0.49:
+- Added new default Inkscape executable path to the search list. So users don't need to specify the Inkscape location in the settings.
+
+Version 0.50:
+- Added support for running two of more lasers by opening more K40 Whisperer windows on a single machine.
+- Added protection to prevent the user from disrupting a running laser job by typing shortcut keys.
+
+Version 0.51:
+- Fixed problem in 0.50 that resulted in origin shifting if laser was not in upper left corner when a job was started.
+
+Version 0.52:
+- Added margin to prevent warning about out of bounds vector features when they are really close to the page boundary.
+- Added explicit font definition for GUI
+
+Version 0.53:
+- Fixed handling of some hidden layers/objects
+- Fixed handling of a less common color specification format
+- Brought back removal of unnecessary commands from data sent to laser (from V0.43 with a correction).  This Reduced volume of data sent to laser.
+
+Version 0.54:
+- Reverted back to egv.py file from Version 0.52 fixing problem with movements introduced in Version 0.53
+
+Version 0.55:
+- Fixed multi-machine operation under Windows 10
+- Fixed an occurrence of "float argument must be a string or a number" error for some SVG files.
+
+Version 0.56:
+- Added code to fix driver conflict new drivers added to Linux
+- Changed default file type to svg/dxf
+
+Version 0.57:
+- Fixed problem with start position (only occurred when using a custom "x scale" factor and "home in upper right")
+- Added Command line option to enable debug mode
+- Some other minor change to the way icons and internal images are handled (no change for user)
+
+Version 0.58:
+- Fixed problem with right mouse click motions that occurred when using "home in upper right"
+
+Version 0.59:
+- Now automatically removes zero length features from input files (caused unnecessary movements before)
+- Removed redundant data sent to laser during raster engraving.  Should reduce pauses for higher speed engraving.
+- Added option for reduced memory use.  This can be enabled to allow for larger designs to be loaded in K40 Whisperer or just increase speed. This option does reduce the resolution of the data coming from Inkscape 500dpi vs 1000dpi.  This should not visibly affect the output in most cases.
+
+Version 0.60:
+- Fixed scaling problem when loading an SVG file with 'Reduced Memory Use' enabled.
+  The problem only occurred if the user was prompted for additional scaling information.
+  
+Version 0.61:
+- Added option in the General Settings to disable waiting for the laser to finish the job after the last data has been sent to the laser.  This can be used to allow the user to start loading the next design as the laser finishes executing the the final data.
+
+Version 0.62:
+- Fixed problem when using M3 Nano board, new job finished code is now detected. 
+- Fixed problem when using M3 Nano board, laser no longer remains on while moving back to starting position after raster engraving.
+- Fixed registration issue between raster and vector operations when custom rapid speed was used.
+- Added Option in the Tools menu that may unfreeze the controller after a job is improperly terminated (will not always work)
+
+Version 0.63:
+- Fixed rapid moves with M3 Nano.  Rapid moves failed if the move command filled exactly one packet of data.  Sending an additional packet of data without any data after the full packet resolved the issue.
+
+Version 0.64:
+- Fixed arcs being drawn in the wrong direction when the radius value was specified as a negative number in an SVG file.
