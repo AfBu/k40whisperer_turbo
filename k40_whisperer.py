@@ -125,8 +125,7 @@ class Application(Frame):
         self.x = -1
         self.y = -1
         self.createWidgets()
-        self.micro = False
-        
+        self.micro = False        
 
     def resetPath(self):
         self.RengData  = ECoord()
@@ -255,6 +254,7 @@ class Application(Frame):
         self.Reng_feed  = StringVar()
         self.Veng_feed  = StringVar()
         self.Vcut_feed  = StringVar()
+        self.fastPlot   = BooleanVar()
 
         self.Reng_passes = StringVar()
         self.Veng_passes = StringVar()
@@ -515,11 +515,18 @@ class Application(Frame):
         self.NormalColor =  self.Entry_Vcut_feed.cget('bg')
 
         # Buttons
-        self.Reng_Button  = Button(self.master,text="Raster Engrave", command=self.Raster_Eng)
-        self.Veng_Button  = Button(self.master,text="Vector Engrave", command=self.Vector_Eng)
-        self.Vcut_Button  = Button(self.master,text="Vector Cut"    , command=self.Vector_Cut)
+        self.Reng_Button  = Button(self.master,text="Raster Engrave", command=self.Raster_Eng, bg='#d6d6d6')
+        self.Reng_Button_Plus  = Button(self.master,text="+", command=self.Raster_Eng_Plus)
+        self.Reng_Button_Minus  = Button(self.master,text="-", command=self.Raster_Eng_Minus)
+        self.Veng_Button  = Button(self.master,text="Vector Engrave", command=self.Vector_Eng, bg='#c2c8ff')
+        self.Veng_Button_Plus   = Button(self.master,text="+", command=self.Vector_Eng_Plus)
+        self.Veng_Button_Minus   = Button(self.master,text="-", command=self.Vector_Eng_Minus)
+        self.Vcut_Button  = Button(self.master,text="Vector Cut"    , command=self.Vector_Cut, bg='#ffc6c2')
+        self.Vcut_Button_Plus  = Button(self.master,text="+"    , command=self.Vector_Cut_Plus)
+        self.Vcut_Button_Minus  = Button(self.master,text="-"    , command=self.Vector_Cut_Minus)
         self.Grun_Button  = Button(self.master,text="Run G-Code"    , command=self.Gcode_Cut)
 
+        self.Frame_Button  = Button(self.master,text="Frame"    , command=self.Move_Frame, bg='#fcba03')
 
         self.Reng_Veng_Button      = Button(self.master,text="Raster and\nVector Engrave", command=self.Raster_Vector_Eng)
         self.Veng_Vcut_Button      = Button(self.master,text="Vector Engrave\nand Cut", command=self.Vector_Eng_Cut)
@@ -527,13 +534,13 @@ class Application(Frame):
         
         self.Label_Position_Control = Label(self.master,text="Position Controls:", anchor=W)
         
-        self.Initialize_Button = Button(self.master,text="Initialize Laser Cutter", command=self.Initialize_Laser)
+        self.Initialize_Button = Button(self.master,text="Initialize Laser Cutter", command=self.Initialize_Laser, bg='#ffffff')
 
-        self.Open_Button       = Button(self.master,text="Open\nDesign File",   command=self.menu_File_Open_Design)
-        self.Reload_Button     = Button(self.master,text="Reload\nDesign File", command=self.menu_Reload_Design)
+        self.Open_Button       = Button(self.master,text="Open\nDesign File",   command=self.menu_File_Open_Design, bg='#bede95')
+        self.Reload_Button     = Button(self.master,text="Reload\nDesign File", command=self.menu_Reload_Design, bg='#dade95')
         
-        self.Home_Button       = Button(self.master,text="Home",            command=self.Home)
-        self.UnLock_Button     = Button(self.master,text="Unlock Rail",     command=self.Unlock)
+        self.Home_Button       = Button(self.master,text="Home",            command=self.Home, bg='#a895de')
+        self.UnLock_Button     = Button(self.master,text="Unlock Rail",     command=self.Unlock, bg='#de95a7')
         self.Stop_Button       = Button(self.master,text="Pause/Stop",      command=self.Stop)
 
         try:            
@@ -541,6 +548,9 @@ class Application(Frame):
             self.right_image = PhotoImage(data=K40_Whisperer_Images.right_B64, format='gif')
             self.up_image    = PhotoImage(data=K40_Whisperer_Images.up_B64,    format='gif')
             self.down_image  = PhotoImage(data=K40_Whisperer_Images.down_B64,  format='gif')
+
+            self.fastplot_on_image  = PhotoImage(data=K40_Whisperer_Images.fp_on_B64,  format='gif')
+            self.fastplot_off_image  = PhotoImage(data=K40_Whisperer_Images.fp_off_B64,  format='gif')
             
             self.Right_Button   = Button(self.master,image=self.right_image, command=self.Move_Right, bg='#efffba')
             self.Right_Button_10   = Button(self.master,image=self.right_image, command=self.Move_Right_10, bg='#ffe9ba')
@@ -592,9 +602,14 @@ class Application(Frame):
         self.Entry_Step   = Entry(self.master,width="15")
         self.Entry_Step.configure(textvariable=self.jog_step, justify='center')
         self.jog_step.trace_variable("w", self.Entry_Step_Callback)
+        self.Step_Button_Plus = Button(self.master,text="+", command=self.Step_Plus)
+        self.Step_Button_Minus = Button(self.master,text="-", command=self.Step_Minus)
+
+        self.FastPlot_Button = Button(self.master,image=self.fastplot_off_image, command=self.Toggle_FastPlot)
+        self.AdvancedShow_Button = Button(self.master,text="ADV",command=self.Toggle_Advanced)
 
         ###########################################################################
-        self.GoTo_Button    = Button(self.master,text="Move To", command=self.GoTo)
+        self.GoTo_Button    = Button(self.master,text="Move To", command=self.GoTo, bg='#87fff5')
         
         self.Entry_GoToX   = Entry(self.master,width="15",justify='center')
         self.Entry_GoToX.configure(textvariable=self.gotoX)
@@ -1330,6 +1345,11 @@ class Application(Frame):
     def Entry_Step_Callback(self, varName, index, mode):
         self.entry_set(self.Entry_Step, self.Entry_Step_Check(), new=1)
 
+    def Step_Plus(self,dummy=None):
+        self.jog_step.set(float(self.jog_step.get()) + 1)
+
+    def Step_Minus(self,dummy=None):
+        self.jog_step.set(float(self.jog_step.get()) - 1)
 
     #############################
     def Entry_GoToX_Check(self):
@@ -2754,6 +2774,13 @@ class Application(Frame):
         else:
             pass
 
+    def Move_Frame(self,dummy=None):
+        self.Move_UL()
+        self.Move_UR()
+        self.Move_LR()
+        self.Move_LL()
+        self.Move_UL()
+
     def Move_CC(self,dummy=None):
         xmin,xmax,ymin,ymax = self.Get_Design_Bounds()
         if self.HomeUR.get():
@@ -2822,7 +2849,7 @@ class Application(Frame):
         self.Rapid_Move( JOG_STEP,0 )
 
     def Move_Right_100(self,dummy=None):
-        JOG_STEP = float( self.jog_step.get() ) * 100.0
+        JOG_STEP = float( self.jog_step.get() ) * 20.0
         self.Rapid_Move( JOG_STEP,0 )
 
     def Move_Left(self,dummy=None):
@@ -2834,7 +2861,7 @@ class Application(Frame):
         self.Rapid_Move( -JOG_STEP,0 )
 
     def Move_Left_100(self,dummy=None):
-        JOG_STEP = float( self.jog_step.get() ) * 100.0
+        JOG_STEP = float( self.jog_step.get() ) * 20.0
         self.Rapid_Move( -JOG_STEP,0 )
 
     def Move_Up(self,dummy=None):
@@ -2846,7 +2873,7 @@ class Application(Frame):
         self.Rapid_Move( 0,JOG_STEP )
 
     def Move_Up_100(self,dummy=None):
-        JOG_STEP = float( self.jog_step.get() ) * 100.0
+        JOG_STEP = float( self.jog_step.get() ) * 20.0
         self.Rapid_Move( 0,JOG_STEP )
 
     def Move_Down(self,dummy=None):
@@ -2858,7 +2885,7 @@ class Application(Frame):
         self.Rapid_Move( 0,-JOG_STEP )
 
     def Move_Down_100(self,dummy=None):
-        JOG_STEP = float( self.jog_step.get() ) * 100.0
+        JOG_STEP = float( self.jog_step.get() ) * 20.0
         self.Rapid_Move( 0,-JOG_STEP )
 
     def Rapid_Move(self,dx,dy):
@@ -2976,6 +3003,12 @@ class Application(Frame):
             self.statusMessage.set("No vector data to cut")
         self.Finish_Job()
         
+    def Vector_Cut_Plus(self, dummy=None):
+        self.Vcut_feed.set(float(self.Vcut_feed.get()) + 1)
+
+    def Vector_Cut_Minus(self, dummy=None):
+        self.Vcut_feed.set(float(self.Vcut_feed.get()) - 1)
+
     def Vector_Eng(self, output_filename=None):
         self.Prepare_for_laser_run("Vector Engrave: Processing Vector Data.")
         if self.VengData.ecoords!=[]:
@@ -2984,6 +3017,12 @@ class Application(Frame):
             self.statusbar.configure( bg = 'yellow' )
             self.statusMessage.set("No vector data to engrave")
         self.Finish_Job()
+
+    def Vector_Eng_Plus(self, dummy=None):
+        self.Veng_feed.set(float(self.Veng_feed.get()) + 1)
+
+    def Vector_Eng_Minus(self, dummy=None):
+        self.Veng_feed.set(float(self.Veng_feed.get()) - 1)
 
     def Trace_Eng(self, output_filename=None):
         self.Prepare_for_laser_run("Boundary Trace: Processing Data.")
@@ -3022,6 +3061,12 @@ class Application(Frame):
             message_box(msg1, msg2)
             debug_message(traceback.format_exc())
         self.Finish_Job()
+
+    def Raster_Eng_Plus(self, dummy=None):
+        self.Reng_feed.set(float(self.Reng_feed.get()) + 10)
+
+    def Raster_Eng_Minus(self, dummy=None):
+        self.Reng_feed.set(float(self.Reng_feed.get()) - 10)
 
     def Raster_Vector_Eng(self, output_filename=None):
         self.Prepare_for_laser_run("Raster Engraving: Processing Image and Vector Data.")
@@ -3782,6 +3827,28 @@ class Application(Frame):
         self.advanced.set(0)
         self.menu_View_Refresh()
 
+    def Show_Advanced(self,event=None):
+        self.advanced.set(1)
+        self.menu_View_Refresh()
+
+    def Toggle_Advanced(self,event=None):
+        if (self.advanced.get() == 0):
+            self.advanced.set(1)
+        else:
+            self.advanced.set(0)
+        self.menu_View_Refresh()
+
+    def Toggle_FastPlot(self,event=None):
+        if (self.fastPlot.get()):
+            self.fastPlot.set(False)
+            self.FastPlot_Button['image']=self.fastplot_off_image
+            #self.FastPlot_Button['text'] = "SP"
+        else:
+            self.fastPlot.set(True)
+            self.FastPlot_Button['image']=self.fastplot_on_image
+            #self.FastPlot_Button['text'] = "FP"
+        self.Plot_Data()
+
     def Release_USB(self):
         if self.k40 != None:
             try:
@@ -4016,6 +4083,12 @@ class Application(Frame):
             self.w=w
             self.h=h
 
+            # TURBO Toolbar
+            typos = 10
+            self.FastPlot_Button.place(x=w - 50, y=typos, width=40, height=40)
+            typos = typos + 45
+            self.AdvancedShow_Button.place(x=w - 50, y=typos, width=40, height=40)
+
             if True:                
                 # Left Column #
                 w_label=120
@@ -4027,28 +4100,36 @@ class Application(Frame):
                 x_units_L=x_entry_L+w_entry+2
 
                 Yloc=10
-                self.Initialize_Button.place (x=12, y=Yloc, width=130*2, height=23)
-                Yloc=Yloc+33
+                self.Initialize_Button.place (x=0, y=Yloc, width=280, height=40)
+                Yloc=Yloc+50
 
-                self.Open_Button.place (x=12, y=Yloc, width=130, height=40)
-                self.Reload_Button.place(x=12+130, y=Yloc, width=130, height=40)                
+                self.Open_Button.place (x=0, y=Yloc, width=140, height=50)
+                self.Reload_Button.place(x=140, y=Yloc, width=140, height=50)                
+                Yloc=Yloc+10
+
                 if h>=660:
                     Yloc=Yloc+50
-                    self.separator1.place(x=x_label_L, y=Yloc,width=w_label+75+40+30, height=2)
-                    Yloc=Yloc+6
-                    self.Label_Position_Control.place(x=x_label_L, y=Yloc, width=w_label*2, height=21)
+                    #self.separator1.place(x=x_label_L, y=Yloc,width=w_label+75+40+30, height=2)
+                    self.separator1.place_forget()
+                    #Yloc=Yloc+6
+                    #self.Label_Position_Control.place(x=x_label_L, y=Yloc, width=w_label*2, height=21)
+                    self.Label_Position_Control.place_forget()
 
-                    Yloc=Yloc+25
-                    self.Home_Button.place (x=12, y=Yloc, width=130, height=23)
-                    self.UnLock_Button.place(x=12+130, y=Yloc, width=130, height=23)
+                    Yloc=Yloc
+                    self.Home_Button.place (x=0, y=Yloc, width=140, height=40)
+                    self.UnLock_Button.place(x=140, y=Yloc, width=140, height=40)
 
-                    Yloc=Yloc+33
-                    self.Label_Step.place(x=x_label_L, y=Yloc, width=w_label, height=21)
-                    self.Label_Step_u.place(x=x_units_L, y=Yloc, width=w_units, height=21)
-                    self.Entry_Step.place(x=x_entry_L, y=Yloc, width=w_entry, height=23)
+                    Yloc=Yloc+50
+                    self.Label_Step.place(x=10, y=Yloc, width=80, height=40)
+                    #self.Label_Step_u.place(x=x_units_L, y=Yloc, width=w_units, height=21)
+                    self.Label_Step_u.place_forget()
+                    
+                    self.Entry_Step.place(x=140, y=Yloc, width=100, height=40)
+                    self.Step_Button_Minus.place(x=100, y=Yloc, width=40, height=40)
+                    self.Step_Button_Plus.place(x=240, y=Yloc, width=40, height=40)
 
                     ###########################################################################
-                    Yloc=Yloc+30
+                    Yloc=Yloc+50
                     bsz=40
                     xoffst=67
                     
@@ -4092,12 +4173,19 @@ class Application(Frame):
 
                     Yloc=Yloc+bsz
                     ###########################################################################
-                    self.Label_GoToX.place(x=x_entry_L, y=Yloc, width=w_entry, height=23)
-                    self.Label_GoToY.place(x=x_units_L, y=Yloc, width=w_entry, height=23)
-                    Yloc=Yloc+25
-                    self.GoTo_Button.place (x=12, y=Yloc, width=100, height=23)
-                    self.Entry_GoToX.place(x=x_entry_L, y=Yloc, width=w_entry, height=23)
-                    self.Entry_GoToY.place(x=x_units_L, y=Yloc, width=w_entry, height=23)
+                    Yloc=Yloc+5
+                    self.Frame_Button.place(x=0, y=Yloc, width=280, height=40)
+
+                    Yloc=Yloc+35
+                    ###########################################################################
+                    #self.Label_GoToX.place(x=x_entry_L, y=Yloc, width=w_entry, height=23)
+                    #self.Label_GoToY.place(x=x_units_L+25, y=Yloc, width=w_entry, height=23)
+                    self.Label_GoToX.place_forget()
+                    self.Label_GoToY.place_forget()
+                    Yloc=Yloc+10
+                    self.GoTo_Button.place (x=0, y=Yloc, width=120, height=40)
+                    self.Entry_GoToX.place(x=x_entry_L-10, y=Yloc, width=w_entry+20, height=40)
+                    self.Entry_GoToY.place(x=x_units_L+15, y=Yloc, width=w_entry+20, height=40)
                     ###########################################################################
                 else:
                     ###########################################################################
@@ -4106,6 +4194,7 @@ class Application(Frame):
                     ##    
                     Yloc=Yloc+50
                     self.separator1.place(x=x_label_L, y=Yloc,width=w_label+75+40+30, height=2)
+                    #self.separator1.place_forget()
                     Yloc=Yloc+6
                     self.Home_Button.place (x=12, y=Yloc, width=130, height=23)
                     self.UnLock_Button.place(x=12+130, y=Yloc, width=130, height=23)
@@ -4133,6 +4222,7 @@ class Application(Frame):
                     self.Label_GoToX.place_forget()
                     self.Label_GoToY.place_forget()
                     self.GoTo_Button.place_forget()
+                    self.Frame_Button.place_forget()
                     self.Entry_GoToX.place_forget()
                     self.Entry_GoToY.place_forget()
                     ###########################################################################
@@ -4140,7 +4230,7 @@ class Application(Frame):
                 #From Bottom up
                 BUinit = self.h-70
                 Yloc = BUinit
-                self.Stop_Button.place (x=12, y=Yloc, width=130*2, height=30)
+                self.Stop_Button.place (x=0, y=Yloc, width=280, height=40)
                 
                 self.Stop_Button.configure(bg='light coral')
                 Yloc=Yloc-10+10
@@ -4157,22 +4247,31 @@ class Application(Frame):
                     self.Reng_Veng_Button.place_forget()
                     self.Veng_Vcut_Button.place_forget()
 
-                    Yloc=Yloc-30
-                    self.Vcut_Button.place      (x=12, y=Yloc, width=130, height=23)
-                    self.Entry_Vcut_feed.place  (x=x_entry_L, y=Yloc, width=w_entry, height=23)
-                    self.Label_Vcut_feed_u.place(x=x_units_L, y=Yloc, width=w_units, height=23)
+                    Yloc=Yloc-40
+                    self.Vcut_Button.place      (x=0, y=Yloc, width=140, height=40)
+                    self.Vcut_Button_Plus.place  (x=240, y=Yloc, width=40, height=40)
+                    self.Vcut_Button_Minus.place  (x=140, y=Yloc, width=40, height=40)
+                    self.Entry_Vcut_feed.place  (x=180, y=Yloc, width=60, height=40)
+                    #self.Label_Vcut_feed_u.place(x=x_units_L, y=Yloc, width=w_units, height=23)
+                    self.Label_Vcut_feed_u.place_forget()
                     Y_Vcut=Yloc
 
-                    Yloc=Yloc-30
-                    self.Veng_Button.place  (x=12, y=Yloc, width=130, height=23)
-                    self.Entry_Veng_feed.place(  x=x_entry_L, y=Yloc, width=w_entry, height=23)
-                    self.Label_Veng_feed_u.place(x=x_units_L, y=Yloc, width=w_units, height=23)
+                    Yloc=Yloc-40
+                    self.Veng_Button.place  (x=0, y=Yloc, width=140, height=40)
+                    self.Veng_Button_Plus.place  (x=240, y=Yloc, width=40, height=40)
+                    self.Veng_Button_Minus.place  (x=140, y=Yloc, width=40, height=40)
+                    self.Entry_Veng_feed.place(  x=180, y=Yloc, width=60, height=40)
+                    #self.Label_Veng_feed_u.place(x=x_units_L, y=Yloc, width=w_units, height=23)
+                    self.Label_Veng_feed_u.place_forget()
                     Y_Veng=Yloc
                     
-                    Yloc=Yloc-30
-                    self.Reng_Button.place  (x=12, y=Yloc, width=130, height=23)
-                    self.Entry_Reng_feed.place(  x=x_entry_L, y=Yloc, width=w_entry, height=23)
-                    self.Label_Reng_feed_u.place(x=x_units_L, y=Yloc, width=w_units, height=23)
+                    Yloc=Yloc-40
+                    self.Reng_Button.place  (x=0, y=Yloc, width=140, height=40)
+                    self.Reng_Button_Plus.place  (x=240, y=Yloc, width=40, height=40)
+                    self.Reng_Button_Minus.place  (x=140, y=Yloc, width=40, height=40)
+                    self.Entry_Reng_feed.place(  x=180, y=Yloc, width=60, height=40)
+                    #self.Label_Reng_feed_u.place(x=x_units_L, y=Yloc, width=w_units, height=23)
+                    self.Label_Reng_feed_u.place_forget()
                     Y_Reng=Yloc
                     
                     if self.comb_vector.get() or self.comb_engrave.get():
@@ -4185,23 +4284,29 @@ class Application(Frame):
                             
                         if self.comb_engrave.get():
                             if self.comb_vector.get():
-                                self.Reng_Veng_Vcut_Button.place(x=12, y=Y_Reng, width=130, height=23*3+14)
+                                self.Reng_Veng_Vcut_Button.place(x=0, y=Y_Reng, width=140, height=120)
                             else:
-                                self.Reng_Veng_Button.place(x=12, y=Y_Reng, width=130, height=23*2+7)
+                                self.Reng_Veng_Button.place(x=0, y=Y_Reng, width=140, height=80)
                         elif self.comb_vector.get():
-                            self.Veng_Vcut_Button.place(x=12, y=Y_Veng, width=130, height=23*2+7)
+                            self.Veng_Vcut_Button.place(x=0, y=Y_Veng, width=140, height=80)
                    
                     
                 else:
                     self.Vcut_Button.place_forget()
+                    self.Vcut_Button_Plus.place_forget()
+                    self.Vcut_Button_Minus.place_forget()
                     self.Entry_Vcut_feed.place_forget()
                     self.Label_Vcut_feed_u.place_forget()
                     
                     self.Veng_Button.place_forget()
+                    self.Veng_Button_Plus.place_forget()
+                    self.Veng_Button_Minus.place_forget()
                     self.Entry_Veng_feed.place_forget()
                     self.Label_Veng_feed_u.place_forget()
                     
                     self.Reng_Button.place_forget()
+                    self.Reng_Button_Plus.place_forget()
+                    self.Reng_Button_Minus.place_forget()
                     self.Entry_Reng_feed.place_forget()
                     self.Label_Reng_feed_u.place_forget()
 
@@ -4210,19 +4315,20 @@ class Application(Frame):
                     self.Veng_Vcut_Button.place_forget()
                     
                     Yloc=Yloc-30
-                    self.Grun_Button.place  (x=12, y=Yloc, width=130*2, height=23)
+                    self.Grun_Button.place  (x=0, y=Yloc, width=280, height=40)
                     
-                if h>=560:
-                    Yloc=Yloc-15
-                    self.separator2.place(x=x_label_L, y=Yloc,width=w_label+75+40+30, height=2)
-                else:
-                    self.separator2.place_forget()
+                #if h>=560:
+                #    Yloc=Yloc-15
+                #    self.separator2.place(x=x_label_L, y=Yloc,width=w_label+75+40+30, height=2)
+                #else:
+                #    self.separator2.place_forget()
+                self.separator2.place_forget()
                     
                 # End Left Column #
 
                 if self.advanced.get():
                    
-                    self.PreviewCanvas.configure( width = self.w-300-wadv, height = self.h-50 )
+                    self.PreviewCanvas.configure( width = self.w-300-wadv-40, height = self.h-50 )
                     self.PreviewCanvas_frame.place(x=280+wadv, y=10)
                     self.separator_vert.place(x=280, y=10,width=2, height=self.h-50)
 
@@ -4374,7 +4480,7 @@ class Application(Frame):
                     self.Entry_Gcde_passes.place_forget()
                     self.Hide_Adv_Button.place_forget()
                     
-                    self.PreviewCanvas.configure( width = self.w-300, height = self.h-50 )
+                    self.PreviewCanvas.configure( width = self.w-300-40, height = self.h-50 )
                     self.PreviewCanvas_frame.place(x=Xvert_sep, y=10)
                     self.separator_vert.place_forget()
 
@@ -4523,7 +4629,6 @@ class Application(Frame):
             self.segID.append( self.PreviewCanvas.create_rectangle(
                             x_lft, y_bot, x_rgt, y_top, fill="gray80", outline="gray80", width = 0) )
 
-
         ######################################
         ###       Plot Raster Image        ###
         ######################################
@@ -4577,7 +4682,7 @@ class Application(Frame):
         ######################################
         ###       Plot Reng Coords         ###
         ######################################
-        if self.include_Rpth.get() and self.RengData.ecoords!=[]:
+        if self.include_Rpth.get() and self.RengData.ecoords!=[] and self.fastPlot.get() == False:
             loop_old = -1
 
             #####
@@ -4605,7 +4710,7 @@ class Application(Frame):
         ######################################
         ###       Plot Veng Coords         ###
         ######################################
-        if self.include_Veng.get():
+        if self.include_Veng.get() and self.fastPlot.get() == False:
             loop_old = -1
             
 
@@ -4628,7 +4733,7 @@ class Application(Frame):
         ######################################
         ###       Plot Vcut Coords         ###
         ######################################
-        if self.include_Vcut.get():
+        if self.include_Vcut.get() and self.fastPlot.get() == False:
             loop_old = -1
 
             plot_coords = self.VcutData.ecoords
@@ -4650,7 +4755,7 @@ class Application(Frame):
         ######################################
         ###       Plot Gcode Coords        ###
         ######################################
-        if self.include_Gcde.get():  
+        if self.include_Gcde.get() and self.fastPlot.get() == False:  
             loop_old = -1
             scale=1
 
@@ -4675,7 +4780,7 @@ class Application(Frame):
         ######################################
         ###       Plot Trace Coords        ###
         ######################################
-        if self.trace_window.winfo_exists():  # or DEBUG:
+        if self.trace_window.winfo_exists() and self.fastPlot.get() == False:  # or DEBUG:
             #####
             Xscale = 1/float(self.LaserXscale.get())
             Yscale = 1/float(self.LaserYscale.get())
