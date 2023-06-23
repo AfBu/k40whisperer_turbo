@@ -255,6 +255,7 @@ class Application(Frame):
         self.Veng_feed  = StringVar()
         self.Vcut_feed  = StringVar()
         self.fastPlot   = BooleanVar()
+        self.saveLoadState = BooleanVar()
 
         self.Reng_passes = StringVar()
         self.Veng_passes = StringVar()
@@ -551,6 +552,8 @@ class Application(Frame):
 
             self.fastplot_on_image  = PhotoImage(data=K40_Whisperer_Images.fp_on_B64,  format='gif')
             self.fastplot_off_image  = PhotoImage(data=K40_Whisperer_Images.fp_off_B64,  format='gif')
+            self.cfg_load_image  = PhotoImage(data=K40_Whisperer_Images.cfg_load_B64,  format='gif')
+            self.cfg_save_image  = PhotoImage(data=K40_Whisperer_Images.cfg_save_B64,  format='gif')
             
             self.Right_Button   = Button(self.master,image=self.right_image, command=self.Move_Right, bg='#efffba')
             self.Right_Button_10   = Button(self.master,image=self.right_image, command=self.Move_Right_10, bg='#ffe9ba')
@@ -605,8 +608,16 @@ class Application(Frame):
         self.Step_Button_Plus = Button(self.master,text="+", command=self.Step_Plus)
         self.Step_Button_Minus = Button(self.master,text="-", command=self.Step_Minus)
 
+        # TURBO TOOLBAR BUTTONS
         self.FastPlot_Button = Button(self.master,image=self.fastplot_off_image, command=self.Toggle_FastPlot)
         self.AdvancedShow_Button = Button(self.master,text="ADV",command=self.Toggle_Advanced)
+        self.Remember_Button = Button(self.master,text="REM",command=self.Remember_Position)
+        self.SaveLoad_Button = Button(self.master,image=self.cfg_load_image,command=self.SaveLoad_Toggle)
+        self.SaveSlot_Button1 = Button(self.master,text="1",command=lambda: self.SaveLoad_Slot("1"))
+        self.SaveSlot_Button2 = Button(self.master,text="2",command=lambda: self.SaveLoad_Slot("2"))
+        self.SaveSlot_Button3 = Button(self.master,text="3",command=lambda: self.SaveLoad_Slot("3"))
+        self.SaveSlot_Button4 = Button(self.master,text="4",command=lambda: self.SaveLoad_Slot("4"))
+        self.SaveSlot_Button5 = Button(self.master,text="5",command=lambda: self.SaveLoad_Slot("5"))
 
         ###########################################################################
         self.GoTo_Button    = Button(self.master,text="Move To", command=self.GoTo, bg='#87fff5')
@@ -928,6 +939,34 @@ class Application(Frame):
             win_id.deiconify()
         except:
             pass
+
+    def Read_Config_File_Ex(self, config_file):
+        home_config1 = self.HOME_DIR + "/" + config_file
+        if ( os.path.isfile(home_config1) ):
+            self.Open_Settings_File(home_config1)
+            self.statusMessage.set("Configuration File Loaded: %s" %(config_file))
+        else:
+            self.statusMessage.set("Configuration File Not Found: %s" %(config_file))
+        #self.menu_View_Refresh()
+
+    def Write_Config_File_Ex(self, config_file):
+        config_data = self.WriteConfig()
+        configname_full = self.HOME_DIR + "/" + config_file
+
+        try:
+            fout = open(configname_full,'w')
+        except:
+            self.statusMessage.set("Unable to open file for writing: %s" %(configname_full))
+            self.statusbar.configure( bg = 'red' )
+            return
+        for line in config_data:
+            try:
+                fout.write(line+'\n')
+            except:
+                fout.write('(skipping line)\n')
+        fout.close
+        self.statusMessage.set("Configuration File Saved: %s" %(configname_full))
+        self.statusbar.configure( bg = 'white' )
 
     ################################################################################
     def WriteConfig(self):
@@ -3849,6 +3888,28 @@ class Application(Frame):
             #self.FastPlot_Button['text'] = "FP"
         self.Plot_Data()
 
+    def Remember_Position(self,event=None):
+        if self.units.get()=="in":
+            self.gotoX.set(self.laserX + self.pos_offset[0]/1000.0)
+            self.gotoY.set(self.laserY + self.pos_offset[1]/1000.0)
+        else:
+            self.gotoX.set((self.laserX + self.pos_offset[0]/1000.0)*self.units_scale)
+            self.gotoY.set((self.laserY + self.pos_offset[1]/1000.0)*self.units_scale)
+
+    def SaveLoad_Toggle(self,event=None):
+        if self.saveLoadState.get():
+            self.saveLoadState.set(False)
+            self.SaveLoad_Button['image'] = self.cfg_load_image
+        else:
+            self.saveLoadState.set(True)
+            self.SaveLoad_Button['image'] = self.cfg_save_image
+
+    def SaveLoad_Slot(self,btn=None):
+        if (self.saveLoadState.get()):
+            self.Write_Config_File_Ex("k40_whisperer_%s.txt" %(btn))
+        else:
+            self.Read_Config_File_Ex("k40_whisperer_%s.txt" %(btn))
+
     def Release_USB(self):
         if self.k40 != None:
             try:
@@ -4088,6 +4149,21 @@ class Application(Frame):
             self.FastPlot_Button.place(x=w - 50, y=typos, width=40, height=40)
             typos = typos + 45
             self.AdvancedShow_Button.place(x=w - 50, y=typos, width=40, height=40)
+            typos = typos + 45
+            self.Remember_Button.place(x=w - 50, y=typos, width=40, height=40)
+
+            typos = h - 70
+            self.SaveSlot_Button5.place(x=w - 50, y=typos, width=40, height=40)
+            typos = typos - 45
+            self.SaveSlot_Button4.place(x=w - 50, y=typos, width=40, height=40)
+            typos = typos - 45
+            self.SaveSlot_Button3.place(x=w - 50, y=typos, width=40, height=40)
+            typos = typos - 45
+            self.SaveSlot_Button2.place(x=w - 50, y=typos, width=40, height=40)
+            typos = typos - 45
+            self.SaveSlot_Button1.place(x=w - 50, y=typos, width=40, height=40)
+            typos = typos - 45
+            self.SaveLoad_Button.place(x=w - 50, y=typos, width=40, height=40)
 
             if True:                
                 # Left Column #
