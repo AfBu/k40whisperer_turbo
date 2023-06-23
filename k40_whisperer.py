@@ -516,7 +516,7 @@ class Application(Frame):
         self.NormalColor =  self.Entry_Vcut_feed.cget('bg')
 
         # Buttons
-        self.Reng_Button  = Button(self.master,text="Raster Engrave", command=self.Raster_Eng, bg='#d6d6d6')
+        self.Reng_Button  = Button(self.master,text="Raster Engrave", command=self.Raster_Eng, bg='#aaaaaa')
         self.Reng_Button_Plus  = Button(self.master,text="+", command=self.Raster_Eng_Plus)
         self.Reng_Button_Minus  = Button(self.master,text="-", command=self.Raster_Eng_Minus)
         self.Veng_Button  = Button(self.master,text="Vector Engrave", command=self.Vector_Eng, bg='#c2c8ff')
@@ -526,6 +526,13 @@ class Application(Frame):
         self.Vcut_Button_Plus  = Button(self.master,text="+"    , command=self.Vector_Cut_Plus)
         self.Vcut_Button_Minus  = Button(self.master,text="-"    , command=self.Vector_Cut_Minus)
         self.Grun_Button  = Button(self.master,text="Run G-Code"    , command=self.Gcode_Cut)
+
+        self.Reng_Passes_Button_Plus  = Button(self.master,text="+", command=self.Reng_Passes_Plus)
+        self.Reng_Passes_Button_Minus  = Button(self.master,text="-", command=self.Reng_Passes_Minus)
+        self.Veng_Passes_Button_Plus  = Button(self.master,text="+", command=self.Veng_Passes_Plus)
+        self.Veng_Passes_Button_Minus  = Button(self.master,text="-", command=self.Veng_Passes_Minus)
+        self.Vcut_Passes_Button_Plus  = Button(self.master,text="+", command=self.Vcut_Passes_Plus)
+        self.Vcut_Passes_Button_Minus  = Button(self.master,text="-", command=self.Vcut_Passes_Minus)
 
         self.Frame_Button  = Button(self.master,text="Frame"    , command=self.Move_Frame, bg='#fcba03')
 
@@ -554,6 +561,11 @@ class Application(Frame):
             self.fastplot_off_image  = PhotoImage(data=K40_Whisperer_Images.fp_off_B64,  format='gif')
             self.cfg_load_image  = PhotoImage(data=K40_Whisperer_Images.cfg_load_B64,  format='gif')
             self.cfg_save_image  = PhotoImage(data=K40_Whisperer_Images.cfg_save_B64,  format='gif')
+            self.fs_image  = PhotoImage(data=K40_Whisperer_Images.fs_B64,  format='gif')
+            self.adv_image  = PhotoImage(data=K40_Whisperer_Images.adv_B64,  format='gif')
+            self.xy_image  = PhotoImage(data=K40_Whisperer_Images.xy_B64,  format='gif')
+            self.check_on_image  = PhotoImage(data=K40_Whisperer_Images.check_on_B64,  format='gif')
+            self.check_off_image  = PhotoImage(data=K40_Whisperer_Images.check_off_B64,  format='gif')
             
             self.Right_Button   = Button(self.master,image=self.right_image, command=self.Move_Right, bg='#efffba')
             self.Right_Button_10   = Button(self.master,image=self.right_image, command=self.Move_Right_10, bg='#ffe9ba')
@@ -610,8 +622,11 @@ class Application(Frame):
 
         # TURBO TOOLBAR BUTTONS
         self.FastPlot_Button = Button(self.master,image=self.fastplot_off_image, command=self.Toggle_FastPlot)
-        self.AdvancedShow_Button = Button(self.master,text="ADV",command=self.Toggle_Advanced)
-        self.Remember_Button = Button(self.master,text="REM",command=self.Remember_Position)
+        self.AdvancedShow_Button = Button(self.master,image=self.adv_image,command=self.Toggle_Advanced)
+        self.Remember_Button = Button(self.master,image=self.xy_image,command=self.Remember_Position)
+        self.Fullscreen_Button = Button(self.master,image=self.fs_image,command=self.Toggle_Fullscreen)
+        
+        
         self.SaveLoad_Button = Button(self.master,image=self.cfg_load_image,command=self.SaveLoad_Toggle)
         self.SaveSlot_Button1 = Button(self.master,text="1",command=lambda: self.SaveLoad_Slot("1"))
         self.SaveSlot_Button2 = Button(self.master,text="2",command=lambda: self.SaveLoad_Slot("2"))
@@ -640,45 +655,45 @@ class Application(Frame):
         self.separator_adv = Frame(self.master, height=2, bd=1, relief=SUNKEN)       
 
         self.Label_Halftone_adv = Label(self.master,text="Halftone (Dither)")
-        self.Checkbutton_Halftone_adv = Checkbutton(self.master,text=" ", anchor=W)
+        self.Checkbutton_Halftone_adv = Checkbutton(self.master,text=" ",image=self.check_off_image,selectimage=self.check_on_image,indicatoron=False,anchor=CENTER)
         self.Checkbutton_Halftone_adv.configure(variable=self.halftone)
         self.halftone.trace_variable("w", self.View_Refresh_and_Reset_RasterPath) #self.menu_View_Refresh_Callback
 
         self.Label_Negate_adv = Label(self.master,text="Invert Raster Color")
-        self.Checkbutton_Negate_adv = Checkbutton(self.master,text=" ", anchor=W)
+        self.Checkbutton_Negate_adv = Checkbutton(self.master,text=" ",image=self.check_off_image,selectimage=self.check_on_image,indicatoron=False,anchor=CENTER)
         self.Checkbutton_Negate_adv.configure(variable=self.negate)
         self.negate.trace_variable("w", self.View_Refresh_and_Reset_RasterPath)
 
         self.separator_adv2 = Frame(self.master, height=2, bd=1, relief=SUNKEN)  
 
         self.Label_Mirror_adv = Label(self.master,text="Mirror Design")
-        self.Checkbutton_Mirror_adv = Checkbutton(self.master,text=" ", anchor=W)
+        self.Checkbutton_Mirror_adv = Checkbutton(self.master,text=" ",image=self.check_off_image,selectimage=self.check_on_image,indicatoron=False,anchor=CENTER)
         self.Checkbutton_Mirror_adv.configure(variable=self.mirror)
         self.mirror.trace_variable("w", self.View_Refresh_and_Reset_RasterPath)
 
         self.Label_Rotate_adv = Label(self.master,text="Rotate Design")
-        self.Checkbutton_Rotate_adv = Checkbutton(self.master,text=" ", anchor=W)
+        self.Checkbutton_Rotate_adv = Checkbutton(self.master,text=" ",image=self.check_off_image,selectimage=self.check_on_image,indicatoron=False,anchor=CENTER)
         self.Checkbutton_Rotate_adv.configure(variable=self.rotate)
         self.rotate.trace_variable("w", self.View_Refresh_and_Reset_RasterPath)
 
         self.separator_adv3 = Frame(self.master, height=2, bd=1, relief=SUNKEN)
         
         self.Label_inputCSYS_adv = Label(self.master,text="Use Input CSYS")
-        self.Checkbutton_inputCSYS_adv = Checkbutton(self.master,text=" ", anchor=W)
+        self.Checkbutton_inputCSYS_adv = Checkbutton(self.master,text=" ",image=self.check_off_image,selectimage=self.check_on_image,indicatoron=False,anchor=CENTER)
         self.Checkbutton_inputCSYS_adv.configure(variable=self.inputCSYS)
         self.inputCSYS.trace_variable("w", self.menu_View_inputCSYS_Refresh_Callback)
 
         self.Label_Inside_First_adv = Label(self.master,text="Cut Inside First")
-        self.Checkbutton_Inside_First_adv = Checkbutton(self.master,text=" ", anchor=W)
+        self.Checkbutton_Inside_First_adv = Checkbutton(self.master,text=" ",image=self.check_off_image,selectimage=self.check_on_image,indicatoron=False,anchor=CENTER)
         self.Checkbutton_Inside_First_adv.configure(variable=self.inside_first)
         self.inside_first.trace_variable("w", self.menu_Inside_First_Callback)
 
         self.Label_Inside_First_adv = Label(self.master,text="Cut Inside First")
-        self.Checkbutton_Inside_First_adv = Checkbutton(self.master,text=" ", anchor=W)
+        self.Checkbutton_Inside_First_adv = Checkbutton(self.master,text=" ",image=self.check_off_image,selectimage=self.check_on_image,indicatoron=False,anchor=CENTER)
         self.Checkbutton_Inside_First_adv.configure(variable=self.inside_first)
 
         self.Label_Rotary_Enable_adv = Label(self.master,text="Use Rotary Settings")
-        self.Checkbutton_Rotary_Enable_adv = Checkbutton(self.master,text="")
+        self.Checkbutton_Rotary_Enable_adv = Checkbutton(self.master,text=" ",image=self.check_off_image,selectimage=self.check_on_image,indicatoron=False,anchor=CENTER)
         self.Checkbutton_Rotary_Enable_adv.configure(variable=self.rotary)
         self.rotary.trace_variable("w", self.Reset_RasterPath_and_Update_Time)
 
@@ -687,29 +702,29 @@ class Application(Frame):
         self.separator_comb = Frame(self.master, height=2, bd=1, relief=SUNKEN)  
 
         self.Label_Comb_Engrave_adv = Label(self.master,text="Group Engrave Tasks")
-        self.Checkbutton_Comb_Engrave_adv = Checkbutton(self.master,text=" ", anchor=W)
+        self.Checkbutton_Comb_Engrave_adv = Checkbutton(self.master,text=" ",image=self.check_off_image,selectimage=self.check_on_image,indicatoron=False,anchor=CENTER)
         self.Checkbutton_Comb_Engrave_adv.configure(variable=self.comb_engrave)
         self.comb_engrave.trace_variable("w", self.menu_View_Refresh_Callback)
 
         self.Label_Comb_Vector_adv = Label(self.master,text="Group Vector Tasks")
-        self.Checkbutton_Comb_Vector_adv = Checkbutton(self.master,text=" ", anchor=W)
+        self.Checkbutton_Comb_Vector_adv = Checkbutton(self.master,text=" ",image=self.check_off_image,selectimage=self.check_on_image,indicatoron=False,anchor=CENTER)
         self.Checkbutton_Comb_Vector_adv.configure(variable=self.comb_vector)
         self.comb_vector.trace_variable("w", self.menu_View_Refresh_Callback) 
         #####
         
-        self.Label_Reng_passes = Label(self.master,text="Raster Eng. Passes")
+        self.Label_Reng_passes = Label(self.master,text="Passes")
         self.Entry_Reng_passes   = Entry(self.master,width="15")
         self.Entry_Reng_passes.configure(textvariable=self.Reng_passes,justify='center',fg="black")
         self.Reng_passes.trace_variable("w", self.Entry_Reng_passes_Callback)
         self.NormalColor =  self.Entry_Reng_passes.cget('bg')
 
-        self.Label_Veng_passes = Label(self.master,text="Vector Eng. Passes")
+        self.Label_Veng_passes = Label(self.master,text="Passes")
         self.Entry_Veng_passes   = Entry(self.master,width="15")
         self.Entry_Veng_passes.configure(textvariable=self.Veng_passes,justify='center',fg="blue")
         self.Veng_passes.trace_variable("w", self.Entry_Veng_passes_Callback)
         self.NormalColor =  self.Entry_Veng_passes.cget('bg')
 
-        self.Label_Vcut_passes = Label(self.master,text="Vector Cut Passes")
+        self.Label_Vcut_passes = Label(self.master,text="Passes")
         self.Entry_Vcut_passes   = Entry(self.master,width="15")
         self.Entry_Vcut_passes.configure(textvariable=self.Vcut_passes,justify='center',fg="red")
         self.Vcut_passes.trace_variable("w", self.Entry_Vcut_passes_Callback)
@@ -722,7 +737,7 @@ class Application(Frame):
         self.NormalColor =  self.Entry_Gcde_passes.cget('bg')
 
         
-        self.Hide_Adv_Button = Button(self.master,text="Hide Advanced", command=self.Hide_Advanced)
+        self.Hide_Adv_Button = Button(self.master,text="Hide Advanced", command=self.Hide_Advanced,bg='#cccccc')
                 
         # End Right Column #
         self.calc_button = Button(self.master,text="Calculate Raster Time", command=self.menu_Calc_Raster_Time)
@@ -3048,6 +3063,25 @@ class Application(Frame):
     def Vector_Cut_Minus(self, dummy=None):
         self.Vcut_feed.set(float(self.Vcut_feed.get()) - 1)
 
+    def Reng_Passes_Plus(self, dummy=None):
+        self.Reng_passes.set(int(self.Reng_passes.get()) + 1)
+
+    def Reng_Passes_Minus(self, dummy=None):
+        self.Reng_passes.set(int(self.Reng_passes.get()) - 1)
+
+    def Veng_Passes_Plus(self, dummy=None):
+        self.Veng_passes.set(int(self.Veng_passes.get()) + 1)
+
+    def Veng_Passes_Minus(self, dummy=None):
+        self.Veng_passes.set(int(self.Veng_passes.get()) - 1)
+
+    def Vcut_Passes_Plus(self, dummy=None):
+        self.Vcut_passes.set(int(self.Vcut_passes.get()) + 1)
+
+    def Vcut_Passes_Minus(self, dummy=None):
+        self.Vcut_passes.set(int(self.Vcut_passes.get()) - 1)
+
+
     def Vector_Eng(self, output_filename=None):
         self.Prepare_for_laser_run("Vector Engrave: Processing Vector Data.")
         if self.VengData.ecoords!=[]:
@@ -4148,6 +4182,8 @@ class Application(Frame):
             typos = 10
             self.FastPlot_Button.place(x=w - 50, y=typos, width=40, height=40)
             typos = typos + 45
+            self.Fullscreen_Button.place(x=w-50, y=typos, width=40, height=40)
+            typos = typos + 45
             self.AdvancedShow_Button.place(x=w - 50, y=typos, width=40, height=40)
             typos = typos + 45
             self.Remember_Button.place(x=w - 50, y=typos, width=40, height=40)
@@ -4315,7 +4351,7 @@ class Application(Frame):
                 wadv_use   = wadv-20
                 Xvert_sep  = 280
                 Xadvanced  = Xvert_sep+10
-                w_label_adv= wadv-80 #  110 w_entry
+                w_label_adv= wadv-60 #  110 w_entry
 
                 if self.GcodeData.ecoords == []:
                     self.Grun_Button.place_forget()
@@ -4409,44 +4445,44 @@ class Application(Frame):
                     self.separator_vert.place(x=280, y=10,width=2, height=self.h-50)
 
                     adv_Yloc=25-10 #15
-                    self.Label_Advanced_column.place(x=Xadvanced, y=adv_Yloc, width=wadv_use, height=21)
-                    adv_Yloc=adv_Yloc+25
+                    self.Label_Advanced_column.place(x=Xadvanced, y=adv_Yloc, width=wadv_use, height=35)
+                    adv_Yloc=adv_Yloc+40
                     self.separator_adv.place(x=Xadvanced, y=adv_Yloc,width=wadv_use, height=2)
 
                     if h>=560:
-                        adv_Yloc=adv_Yloc+25-20 #15
-                        self.Label_Halftone_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=21)
-                        self.Checkbutton_Halftone_adv.place(x=Xadvanced+w_label_adv+2, y=adv_Yloc, width=25, height=23)
+                        adv_Yloc=adv_Yloc+10
+                        self.Label_Halftone_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=40)
+                        self.Checkbutton_Halftone_adv.place(x=Xadvanced+165, y=adv_Yloc, width=40, height=40)
                     
-                        adv_Yloc=adv_Yloc+25
-                        self.Label_Negate_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=21)
-                        self.Checkbutton_Negate_adv.place(x=Xadvanced+w_label_adv+2, y=adv_Yloc, width=25, height=23)
+                        adv_Yloc=adv_Yloc+45
+                        self.Label_Negate_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=40)
+                        self.Checkbutton_Negate_adv.place(x=Xadvanced+165, y=adv_Yloc, width=40, height=40)
 
-                        adv_Yloc=adv_Yloc+25
+                        adv_Yloc=adv_Yloc+45
                         self.separator_adv2.place(x=Xadvanced, y=adv_Yloc,width=wadv_use, height=2)
                     
-                        adv_Yloc=adv_Yloc+25-20
-                        self.Label_Mirror_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=21)
-                        self.Checkbutton_Mirror_adv.place(x=Xadvanced+w_label_adv+2, y=adv_Yloc, width=25, height=23)
+                        adv_Yloc=adv_Yloc+10
+                        self.Label_Mirror_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=40)
+                        self.Checkbutton_Mirror_adv.place(x=Xadvanced+165, y=adv_Yloc, width=40, height=40)
 
-                        adv_Yloc=adv_Yloc+25
-                        self.Label_Rotate_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=21)
-                        self.Checkbutton_Rotate_adv.place(x=Xadvanced+w_label_adv+2, y=adv_Yloc, width=25, height=23)
+                        adv_Yloc=adv_Yloc+45
+                        self.Label_Rotate_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=40)
+                        self.Checkbutton_Rotate_adv.place(x=Xadvanced+165, y=adv_Yloc, width=40, height=40)
 
-                        adv_Yloc=adv_Yloc+25
-                        self.Label_inputCSYS_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=21)
-                        self.Checkbutton_inputCSYS_adv.place(x=Xadvanced+w_label_adv+2, y=adv_Yloc, width=25, height=23)
+                        adv_Yloc=adv_Yloc+45
+                        self.Label_inputCSYS_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=40)
+                        self.Checkbutton_inputCSYS_adv.place(x=Xadvanced+165, y=adv_Yloc, width=40, height=40)
                     
-                        adv_Yloc=adv_Yloc+25
+                        adv_Yloc=adv_Yloc+45
                         self.separator_adv3.place(x=Xadvanced, y=adv_Yloc,width=wadv_use, height=2)
 
-                        adv_Yloc=adv_Yloc+25-20
-                        self.Label_Inside_First_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=21)
-                        self.Checkbutton_Inside_First_adv.place(x=Xadvanced+w_label_adv+2, y=adv_Yloc, width=25, height=23)
+                        adv_Yloc=adv_Yloc+10
+                        self.Label_Inside_First_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=40)
+                        self.Checkbutton_Inside_First_adv.place(x=Xadvanced+165, y=adv_Yloc, width=40, height=40)
                     
-                        adv_Yloc=adv_Yloc+25
-                        self.Label_Rotary_Enable_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=21)
-                        self.Checkbutton_Rotary_Enable_adv.place(x=Xadvanced+w_label_adv+2, y=adv_Yloc, width=25, height=23)
+                        adv_Yloc=adv_Yloc+45
+                        self.Label_Rotary_Enable_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=40)
+                        self.Checkbutton_Rotary_Enable_adv.place(x=Xadvanced+165, y=adv_Yloc, width=40, height=40)
                     else:
                         #self.Label_Advanced_column.place_forget()
                         #self.separator_adv.place_forget()
@@ -4468,7 +4504,7 @@ class Application(Frame):
                         self.Checkbutton_Rotary_Enable_adv.place_forget()
 
                     adv_Yloc = BUinit
-                    self.Hide_Adv_Button.place (x=Xadvanced, y=adv_Yloc, width=wadv_use, height=30)
+                    self.Hide_Adv_Button.place (x=Xadvanced-5, y=adv_Yloc, width=wadv_use+10, height=40)
 
                     if self.RengData.image != None:
                         self.Label_inputCSYS_adv.configure(state="disabled")
@@ -4478,16 +4514,22 @@ class Application(Frame):
                         
                     if self.GcodeData.ecoords == []:
                         #adv_Yloc = adv_Yloc-40
-                        self.Label_Vcut_passes.place(x=Xadvanced, y=Y_Vcut, width=w_label_adv, height=21)
-                        self.Entry_Vcut_passes.place(x=Xadvanced+w_label_adv+2, y=Y_Vcut, width=w_entry, height=23)
+                        self.Label_Vcut_passes.place(x=Xadvanced, y=Y_Vcut, width=75, height=40)
+                        self.Entry_Vcut_passes.place(x=Xadvanced+120, y=Y_Vcut, width=45, height=40)
+                        self.Vcut_Passes_Button_Plus.place(x=Xadvanced+165, y=Y_Vcut, width=40, height=40)
+                        self.Vcut_Passes_Button_Minus.place(x=Xadvanced+80, y=Y_Vcut, width=40, height=40)
 
                         #adv_Yloc=adv_Yloc-30
-                        self.Label_Veng_passes.place(x=Xadvanced, y=Y_Veng, width=w_label_adv, height=21)
-                        self.Entry_Veng_passes.place(x=Xadvanced+w_label_adv+2, y=Y_Veng, width=w_entry, height=23)
+                        self.Label_Veng_passes.place(x=Xadvanced, y=Y_Veng, width=75, height=40)
+                        self.Entry_Veng_passes.place(x=Xadvanced+120, y=Y_Veng, width=45, height=40)
+                        self.Veng_Passes_Button_Plus.place(x=Xadvanced+165, y=Y_Veng, width=40, height=40)
+                        self.Veng_Passes_Button_Minus.place(x=Xadvanced+80, y=Y_Veng, width=40, height=40)
 
                         #adv_Yloc=adv_Yloc-30
-                        self.Label_Reng_passes.place(x=Xadvanced, y=Y_Reng, width=w_label_adv, height=21)
-                        self.Entry_Reng_passes.place(x=Xadvanced+w_label_adv+2, y=Y_Reng, width=w_entry, height=23)
+                        self.Label_Reng_passes.place(x=Xadvanced, y=Y_Reng, width=75, height=40)
+                        self.Entry_Reng_passes.place(x=Xadvanced+120, y=Y_Reng, width=45, height=40)
+                        self.Reng_Passes_Button_Plus.place(x=Xadvanced+165, y=Y_Reng, width=40, height=40)
+                        self.Reng_Passes_Button_Minus.place(x=Xadvanced+80, y=Y_Reng, width=40, height=40)
                         self.Label_Gcde_passes.place_forget()
                         self.Entry_Gcde_passes.place_forget()
                         adv_Yloc = Y_Reng
@@ -4496,13 +4538,13 @@ class Application(Frame):
                         adv_Yloc=adv_Yloc-15
                         self.separator_comb.place(x=Xadvanced-1, y=adv_Yloc, width=wadv_use, height=2)
 
-                        adv_Yloc=adv_Yloc-25
-                        self.Label_Comb_Vector_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=21)
-                        self.Checkbutton_Comb_Vector_adv.place(x=Xadvanced+w_label_adv+2, y=adv_Yloc, width=25, height=23)
+                        adv_Yloc=adv_Yloc-45
+                        self.Label_Comb_Vector_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=40)
+                        self.Checkbutton_Comb_Vector_adv.place(x=Xadvanced+165, y=adv_Yloc, width=40, height=40)
                         
-                        adv_Yloc=adv_Yloc-25
-                        self.Label_Comb_Engrave_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=21)
-                        self.Checkbutton_Comb_Engrave_adv.place(x=Xadvanced+w_label_adv+2, y=adv_Yloc, width=25, height=23)
+                        adv_Yloc=adv_Yloc-45
+                        self.Label_Comb_Engrave_adv.place(x=Xadvanced, y=adv_Yloc, width=w_label_adv, height=40)
+                        self.Checkbutton_Comb_Engrave_adv.place(x=Xadvanced+165, y=adv_Yloc, width=40, height=40)
                         ####
                         
                     else:
@@ -4515,6 +4557,12 @@ class Application(Frame):
                         self.Entry_Veng_passes.place_forget()
                         self.Label_Reng_passes.place_forget()
                         self.Entry_Reng_passes.place_forget()
+                        self.Veng_Passes_Button_Plus.place_forget()
+                        self.Veng_Passes_Button_Minus.place_forget()
+                        self.Reng_Passes_Button_Plus.place_forget()
+                        self.Reng_Passes_Button_Minus.place_forget()
+                        self.Vcut_Passes_Button_Plus.place_forget()
+                        self.Vcut_Passes_Button_Minus.place_forget()
 
                 else:
                     self.PreviewCanvas_frame.place_forget()
@@ -4545,6 +4593,12 @@ class Application(Frame):
                     self.Label_Comb_Vector_adv.place_forget()
                     self.Checkbutton_Comb_Vector_adv.place_forget()
 
+                    self.Veng_Passes_Button_Plus.place_forget()
+                    self.Veng_Passes_Button_Minus.place_forget()
+                    self.Reng_Passes_Button_Plus.place_forget()
+                    self.Reng_Passes_Button_Minus.place_forget()
+                    self.Vcut_Passes_Button_Plus.place_forget()
+                    self.Vcut_Passes_Button_Minus.place_forget()
 
                     self.Entry_Vcut_passes.place_forget()
                     self.Label_Vcut_passes.place_forget()
