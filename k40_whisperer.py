@@ -6119,7 +6119,7 @@ Icon_Set=False
 
 try:
     #debug_message("Icon set %s" %(sys.argv[0]))
-    root.iconbitmap(default="emblem")
+    root.iconbitmap(default="icon_32.png")
     #debug_message("Icon set worked %s" %(sys.argv[0]))
     Icon_Set=True
 except:
@@ -6128,20 +6128,55 @@ except:
         
 if not Icon_Set:
     try:
-        scorch_ico_B64=b'R0lGODlhEAAQAIYAAA\
-        AAABAQEBYWFhcXFxsbGyUlJSYmJikpKSwsLC4uLi8vLzExMTMzMzc3Nzg4ODk5OTs7Oz4+PkJCQkRERE\
-        VFRUtLS0xMTE5OTlNTU1dXV1xcXGBgYGVlZWhoaGtra3FxcXR0dHh4eICAgISEhI+Pj5mZmZ2dnaKioq\
-        Ojo62tra6urrS0tLi4uLm5ub29vcLCwsbGxsjIyMzMzM/Pz9PT09XV1dbW1tjY2Nzc3OHh4eLi4uXl5e\
-        fn5+jo6Ovr6+/v7/Hx8fLy8vT09PX19fn5+fv7+/z8/P7+/v///wAAAAAAAAAAAAAAAAAAAAAAAAAAAA\
-        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\
-        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\
-        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEKAEkALAAAAAAQABAAQAj/AJMIFBhBQYAACRIkWbgwAA\
-        4kEFEECACAxBAkGH8ESEKgBZIiAIQECBAjAA8kNwIkScKgQhAkRggAIJACCZIaJxgk2clgAY4OAAoEAO\
-        ABCIIDSZIwkIHEBw0YFAAA6IGDCBIkLAhMyICka9cAKZCIRTLEBIMkaA0MSNGjSBEVIgpESEK3LgMCI1\
-        aAWCFDA4EDSQInwaDACBEAImLwCAFARw4HFJJcgGADyZEAL3YQcMGBBpIjHx4EeIGkRoMFJgakWADABx\
-        IkPwIgcIGkdm0AMJDo1g3jQBIBRZAINyKAwxEkyHEUSMIcwYYbEgwYmQGgyI8SD5Jo327hgIIAAQ5cBs\
-        CQpHySgAA7'
-        icon_im =PhotoImage(data=scorch_ico_B64, format='gif')
+        scorch_ico_B64=b'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'
+
+        icon_im =PhotoImage(data=scorch_ico_B64, format='png')
         root.call('wm', 'iconphoto', root._w, '-default', icon_im)
     except:
         pass
