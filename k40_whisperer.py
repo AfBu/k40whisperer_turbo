@@ -626,6 +626,7 @@ class Application(Frame):
         self.Remember_Button = Button(self.master,image=self.xy_image,command=self.Remember_Position)
         self.Fullscreen_Button = Button(self.master,image=self.fs_image,command=self.Toggle_Fullscreen)
         
+        self.fastPlot.trace_variable("w", self.Update_FastPlot)
         
         self.SaveLoad_Button = Button(self.master,image=self.cfg_load_image,command=self.SaveLoad_Toggle)
         self.SaveSlot_Button1 = Button(self.master,text="1",command=lambda: self.SaveLoad_Slot("1"))
@@ -633,6 +634,7 @@ class Application(Frame):
         self.SaveSlot_Button3 = Button(self.master,text="3",command=lambda: self.SaveLoad_Slot("3"))
         self.SaveSlot_Button4 = Button(self.master,text="4",command=lambda: self.SaveLoad_Slot("4"))
         self.SaveSlot_Button5 = Button(self.master,text="5",command=lambda: self.SaveLoad_Slot("5"))
+        self.SaveSlot_ButtonD = Button(self.master,text="D",command=lambda: self.SaveLoad_Slot("D"))
 
         ###########################################################################
         self.GoTo_Button    = Button(self.master,text="Move To", command=self.GoTo, bg='#87fff5')
@@ -1072,6 +1074,7 @@ class Application(Frame):
         header.append('(k40_whisperer_set inkscape_path \042%s\042 )' %( self.inkscape_path.get() ))
         header.append('(k40_whisperer_set batch_path    \042%s\042 )' %( self.batch_path.get() ))
 
+        header.append('(k40_whisperer_set fast_plot      %s )'  %( int(self.fastPlot.get())      ))
 
         self.jog_step
         header.append("(=========================================================)")
@@ -2688,7 +2691,8 @@ class Application(Frame):
                          self.inkscape_path.set(line[line.find("inkscape_path"):].split("\042")[1])
                     elif "batch_path"    in line:
                          self.batch_path.set(line[line.find("batch_path"):].split("\042")[1])
-
+                    elif "fast_plot"     in line:
+                         self.fastPlot.set(line[line.find("fast_plot"):].split()[1])
                          
             except:
                 #Ignoring exeptions during reading data from line 
@@ -3922,6 +3926,12 @@ class Application(Frame):
             #self.FastPlot_Button['text'] = "FP"
         self.Plot_Data()
 
+    def Update_FastPlot(self,varName,index,mode):
+        if (self.fastPlot.get()):
+            self.FastPlot_Button['image']=self.fastplot_on_image
+        else:
+            self.FastPlot_Button['image']=self.fastplot_off_image
+
     def Remember_Position(self,event=None):
         if self.units.get()=="in":
             self.gotoX.set(self.laserX + self.pos_offset[0]/1000.0)
@@ -3939,10 +3949,15 @@ class Application(Frame):
             self.SaveLoad_Button['image'] = self.cfg_save_image
 
     def SaveLoad_Slot(self,btn=None):
-        if (self.saveLoadState.get()):
-            self.Write_Config_File_Ex("k40_whisperer_%s.txt" %(btn))
+        if (btn != 'D'):
+            btn = '_' + btn
         else:
-            self.Read_Config_File_Ex("k40_whisperer_%s.txt" %(btn))
+            btn = ''
+
+        if (self.saveLoadState.get()):
+            self.Write_Config_File_Ex("k40_whisperer%s.txt" %(btn))
+        else:
+            self.Read_Config_File_Ex("k40_whisperer%s.txt" %(btn))
 
     def Release_USB(self):
         if self.k40 != None:
@@ -4198,6 +4213,8 @@ class Application(Frame):
             self.SaveSlot_Button2.place(x=w - 50, y=typos, width=40, height=40)
             typos = typos - 45
             self.SaveSlot_Button1.place(x=w - 50, y=typos, width=40, height=40)
+            typos = typos - 45
+            self.SaveSlot_ButtonD.place(x=w - 50, y=typos, width=40, height=40)
             typos = typos - 45
             self.SaveLoad_Button.place(x=w - 50, y=typos, width=40, height=40)
 
