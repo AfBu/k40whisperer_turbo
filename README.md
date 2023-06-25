@@ -18,6 +18,7 @@ My fork of [K40 Whisperer](https://www.scorchworks.com/K40whisperer/k40whisperer
   * 5 slot system for settings presets
     * Load/Save button - switches mode of Slot button operation. If set to "Save" mode, pressing Slot button will save app configuration to that slot. If in "Load" mode, pressing Slot button will restore previously saved settings.
     * 1-5 Slot buttons - pressing will Load/Save settings to/from that slot number.
+    * "D" Slot button - will Save/Load settings to/from default settings file loaded at startup.
    
 All new icons were drawn by me, all are licensed as "public domain".
 
