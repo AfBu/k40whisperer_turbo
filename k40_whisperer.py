@@ -849,6 +849,7 @@ class Application(Frame):
         top_Help = Menu(self.menuBar, tearoff=0)
         top_Help.add("command", label = "About (e-mail)", command = self.menu_Help_About)
         top_Help.add("command", label = "K40 Whisperer Web Page", command = self.menu_Help_Web)
+        top_Help.add("command", label = "TURBO fork GitHub page", command = self.menu_Help_GitHub)
         top_Help.add("command", label = "Manual (Web Page)", command = self.menu_Help_Manual)
         self.menuBar.add("cascade", label="Help", menu=top_Help)
 
@@ -4156,12 +4157,17 @@ class Application(Frame):
         about = about + "\163\143\157\162\143\150\100\163\143\157\162"
         about = about + "\143\150\167\157\162\153\163\056\143\157\155\n"
         about = about + "https://www.scorchworks.com/\n\n"
+        about = about + "TURBO fork by AfBu.\n"
+        about = about + "https://github.com/AfBu/k40whisperer_turbo\n\n"
         try:
             python_version = "%d.%d.%d" %(sys.version_info.major,sys.version_info.minor,sys.version_info.micro)
         except:
             python_version = ""
         about = about + "Python "+python_version+" (%d bit)" %(struct.calcsize("P") * 8)
         message_box("About %s" %(application),about)
+
+    def menu_Help_GitHub(self):
+        webbrowser.open_new(r"https://github.com/AfBu/k40whisperer_turbo")
 
     def menu_Help_Web(self):
         webbrowser.open_new(r"https://www.scorchworks.com/K40whisperer/k40whisperer.html")
