@@ -15,6 +15,7 @@ My fork of [K40 Whisperer](https://www.scorchworks.com/K40whisperer/k40whisperer
   * Fullscreen - quickly toggle fullscreen mode
   * Advanced settings - quickly show/hide advanced settings
   * XY Store - stores current laser position in "Move to" inputs
+  * XY Restore - restores position from which last laser operation was started
   * 5 slot system for settings presets
     * Load/Save button - switches mode of Slot button operation. If set to "Save" mode, pressing Slot button will save app configuration to that slot. If in "Load" mode, pressing Slot button will restore previously saved settings.
     * 1-5 Slot buttons - pressing will Load/Save settings to/from that slot number.
