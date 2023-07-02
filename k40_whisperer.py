@@ -295,6 +295,9 @@ class Application(Frame):
         self.gotoX = StringVar()
         self.gotoY = StringVar()
 
+        self.lastX = StringVar()
+        self.lastY = StringVar()
+
         self.n_egv_passes = StringVar()
 
         self.inkscape_path = StringVar()
@@ -409,6 +412,9 @@ class Application(Frame):
 
         self.gotoX.set("0.0")
         self.gotoY.set("0.0")
+
+        self.lastX.set("0.0")
+        self.lastY.set("0.0")
 
         self.n_egv_passes.set("1")
 
@@ -564,6 +570,7 @@ class Application(Frame):
             self.fs_image  = PhotoImage(data=K40_Whisperer_Images.fs_B64,  format='gif')
             self.adv_image  = PhotoImage(data=K40_Whisperer_Images.adv_B64,  format='gif')
             self.xy_image  = PhotoImage(data=K40_Whisperer_Images.xy_B64,  format='gif')
+            self.xyr_image  = PhotoImage(data=K40_Whisperer_Images.xyr_B64,  format='gif')
             self.check_on_image  = PhotoImage(data=K40_Whisperer_Images.check_on_B64,  format='gif')
             self.check_off_image  = PhotoImage(data=K40_Whisperer_Images.check_off_B64,  format='gif')
             
@@ -624,6 +631,7 @@ class Application(Frame):
         self.FastPlot_Button = Button(self.master,image=self.fastplot_off_image, command=self.Toggle_FastPlot)
         self.AdvancedShow_Button = Button(self.master,image=self.adv_image,command=self.Toggle_Advanced)
         self.Remember_Button = Button(self.master,image=self.xy_image,command=self.Remember_Position)
+        self.Restore_Button = Button(self.master,image=self.xyr_image,command=self.Restore_head_position, state="disabled")
         self.Fullscreen_Button = Button(self.master,image=self.fs_image,command=self.Toggle_Fullscreen)
         
         self.fastPlot.trace_variable("w", self.Update_FastPlot)
@@ -3046,6 +3054,7 @@ class Application(Frame):
                 except:
                     pass
             self.Stop_Button.configure(state="normal")
+            self.Fullscreen_Button.configure(state="normal")
             self.statusbar.configure(state="normal")
             self.master.update()
         except:
@@ -3199,9 +3208,29 @@ class Application(Frame):
             self.statusMessage.set("No g-code data to cut")
         self.Finish_Job()
 
+    def Remember_head_position(self):
+        self.Restore_Button.configure(state="normal")
+        if self.units.get()=="in":
+            self.lastX.set(self.laserX + self.pos_offset[0]/1000.0)
+            self.lastY.set(self.laserY + self.pos_offset[1]/1000.0)
+        else:
+            self.lastX.set((self.laserX + self.pos_offset[0]/1000.0)*self.units_scale)
+            self.lastY.set((self.laserY + self.pos_offset[1]/1000.0)*self.units_scale)
+
+    def Restore_head_position(self):
+        xpos = float(self.lastX.get())
+        ypos = float(self.lastY.get())
+        if self.k40 != None:
+            self.k40.home_position()
+        self.laserX  = 0.0
+        self.laserY  = 0.0
+        self.Rapid_Move(xpos,ypos)
+        self.menu_View_Refresh()  
+
     def Prepare_for_laser_run(self,msg):
         self.stop[0]=False
         self.move_head_window_temporary([0,0])
+        self.Remember_head_position()
         self.set_gui("disabled")
         self.statusbar.configure( bg = 'green' )
         self.statusMessage.set(msg)
@@ -4202,6 +4231,8 @@ class Application(Frame):
             self.AdvancedShow_Button.place(x=w - 50, y=typos, width=40, height=40)
             typos = typos + 45
             self.Remember_Button.place(x=w - 50, y=typos, width=40, height=40)
+            typos = typos + 45
+            self.Restore_Button.place(x=w - 50, y=typos, width=40, height=40)
 
             typos = h - 70
             self.SaveSlot_Button5.place(x=w - 50, y=typos, width=40, height=40)
