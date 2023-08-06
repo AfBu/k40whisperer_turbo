@@ -1,3 +1,5 @@
 #!/bin/bash
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-python3 $SCRIPT_DIR/k40_whisperer.py
+cd $SCRIPT_DIR
+source venv/bin/activate
+python k40_whisperer.py
